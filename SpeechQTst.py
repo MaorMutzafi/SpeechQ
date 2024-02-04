@@ -1,5 +1,6 @@
 ## https://alphacephei.com/vosk/install
 
+# Import necessary libraries
 import wave
 import json
 from vosk import Model, KaldiRecognizer, SetLogLevel
@@ -10,20 +11,24 @@ import librosa
 import librosa.display
 import numpy as np
 
-SetLogLevel(-1)  # Reduce Vosk log verbosity
+# Reduce Vosk log verbosity
+SetLogLevel(-1)
 
-# Define paths
+# Define paths to the model and audio file
 model_path = "models/vosk-model-small-en-us-0.15"
 audio_file_path = "snds/1 Minute Aphasia Tips： Music and Speech.wav"
 
+# Function to check and adjust audio file
 def check_and_adjust_audio(audio_file_path):
     try:
+        # Open the audio file
         with wave.open(audio_file_path, "rb") as wf:
             channels = wf.getnchannels()
             framerate = wf.getframerate()
 
             adjusted_file_path = audio_file_path
 
+            # Check and adjust channels and framerate if needed
             if channels != 1 or framerate != 16000:
                 print("Adjusting audio file.")
                 audio = AudioSegment.from_wav(audio_file_path)
@@ -39,6 +44,7 @@ def check_and_adjust_audio(audio_file_path):
         print(f"Error reading audio file: {e}")
         return None
 
+# Function to apply noise reduction to the audio file
 def apply_noise_reduction(audio_file_path):
     try:
         r = sr.Recognizer()
@@ -46,6 +52,7 @@ def apply_noise_reduction(audio_file_path):
             r.adjust_for_ambient_noise(source)
             audio_data = r.record(source)
 
+        # Create denoised audio file
         denoised_file_path = audio_file_path.replace(".wav", "_denoised.wav")
         with wave.open(denoised_file_path, 'wb') as wf:
             wf.setnchannels(1)
@@ -58,12 +65,14 @@ def apply_noise_reduction(audio_file_path):
         print(f"Error applying noise reduction: {e}")
         return None
 
+# Function to recognize speech using Vosk
 def recognize_speech_vosk(audio_file_path, model_path):
     print(audio_file_path)
     model = Model(model_path)
     rec = KaldiRecognizer(model, 16000)
     rec.SetWords(True)
 
+    # Process audio frames for speech recognition
     with wave.open(audio_file_path, "rb") as wf:
         data = wf.readframes(wf.getnframes())
         if rec.AcceptWaveform(data):
@@ -72,31 +81,33 @@ def recognize_speech_vosk(audio_file_path, model_path):
             result = json.loads(rec.FinalResult())
     return result
 
+# Function to visualize spectrogram with annotated words
 def visualize_with_words(audio_file_path, result):
     signal, sr = librosa.load(audio_file_path, sr=None)
     S = librosa.feature.melspectrogram(y=signal, sr=sr, n_mels=128, fmax=8000)
     S_dB = librosa.power_to_db(S, ref=np.max)
 
+    # Plot the Mel-frequency spectrogram
     plt.figure(figsize=(12, 4))
     librosa.display.specshow(S_dB, sr=sr, x_axis='time', y_axis='mel', fmax=8000)
     plt.colorbar(format='%+2.0f dB')
     plt.title('Mel-frequency spectrogram')
     
     if 'result' in result:
+        # Annotate words and draw lines for their duration
         for word_info in result['result']:
             word = word_info['word']
             start_time = word_info['start']
             end_time = word_info['end']
             conf = word_info['conf']
             print(f"\'{word}\', [{start_time}, {end_time}], conf. {conf}")
-            # Annotate word and confidence with larger font size
             plt.annotate(f"{word}\n{conf:.2f}", (start_time + 0.05, 2000), color='white', fontsize=8, ha='center')
-            # Draw a line for the word's duration
             plt.plot([start_time, end_time], [1900, 1900], color=np.random.rand(3,) * 0.8 + 0.2, linewidth=2)
 
     plt.tight_layout()
     plt.show()
 
+# Function to estimate audio quality
 def estimate_audio_quality(audio_file_path, result):
     signal, sr = librosa.load(audio_file_path, sr=None)
     non_word_signal = np.array([])
@@ -151,4 +162,5 @@ result = recognize_speech_vosk(denoised_file_path, model_path)
 # Visualize spectrogram with annotated words
 visualize_with_words(denoised_file_path, result)
 
+# Estimate audio quality
 noise_level, volume, median_confidence, words_per_minute = estimate_audio_quality(audio_file_path, result)
