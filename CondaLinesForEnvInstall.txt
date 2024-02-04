@@ -1,4 +1,0 @@
-conda create --name SpchQ python=3.9
-conda activate SpchQ
-pip install librosa pydub vosk
-conda install -c conda-forge -c defaults numpy matplotlib librosa pydub speechrecognition jupyter spyder-kernels=2.4
