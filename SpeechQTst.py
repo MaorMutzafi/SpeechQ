@@ -13,8 +13,8 @@ import numpy as np
 SetLogLevel(-1)  # Reduce Vosk log verbosity
 
 # Define paths
-model_path = "C:/Users/User/Downloads/SpeechQ/vosk-model-en-us-0.42-gigaspeech"
-audio_file_path = "C:/Users/User/Downloads/SpeechQ/1 Minute Aphasia Tips： Music and Speech.wav"
+model_path = "models/vosk-model-small-en-us-0.15"
+audio_file_path = "snds/1 Minute Aphasia Tips： Music and Speech.wav"
 
 def check_and_adjust_audio(audio_file_path):
     try:
