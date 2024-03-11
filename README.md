@@ -14,7 +14,7 @@ This project utilizes a combination of speech recognition and audio processing l
 
 Before running the project, ensure you have Python 3.x installed. Then, install the required libraries using pip:
 
-"pip install vosk pydub SpeechRecognition matplotlib librosa numpy wave json"
+'pip install vosk pydub SpeechRecognition matplotlib librosa numpy wave json'
 
 
 Download the Vosk model suitable for your language from [Vosk Models](https://alphacephei.com/vosk/models) and extract it to the `models` directory in your project folder. Or use the model in the GIT folder.
@@ -25,6 +25,6 @@ Download the Vosk model suitable for your language from [Vosk Models](https://al
 2. **Update Configuration**: Modify the `audio_file_path` and `model_path` variables in the script to point to your audio file and the Vosk model directory, respectively.
 3. **Run the Script**: Execute the script in your terminal or command prompt.
 
-"python SpeechQTst.py"
+'python SpeechQTst.py'
 
 4. **Review the Output**: The script will adjust the audio file if necessary, apply noise reduction, perform speech recognition, visualize the spectrogram with annotated words, and estimate audio quality.
